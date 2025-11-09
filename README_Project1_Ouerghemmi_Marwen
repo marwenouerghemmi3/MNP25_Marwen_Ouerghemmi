@@ -1,0 +1,88 @@
+README Project1_Ouerghemmi_Marwen
+# Projet Langevin 1D – Reconstruction du potentiel Upair
+
+## Objectif
+
+Ce projet consiste à **simuler deux particules de polystyrène piégées dans une pince optique 1D** et à **reconstruire le potentiel d'interaction Upair** à partir de la distribution de distances obtenue par histogrammes. Le potentiel théorique utilisé est le **Lennard-Jones (LJ)**.  
+Les objectifs spécifiques :  
+- Simuler le système sans interaction LJ et obtenir la densité de probabilité des distances entre particules.  
+- Simuler le système avec interaction LJ.  
+- Répéter les simulations pour plusieurs distances initiales \(r_0\).  
+- Reconstituer le potentiel Upair.  
+- Comparer le potentiel reconstruit avec le potentiel théorique LJ.
+## Description du système
+
+- **Nombre de particules :** 2  
+- **Rayon des particules :** \(a = 1\,\mu m\)  
+- **Pince optique :** rigidité \(\kappa = 0.2 \cdot 10^{-6}\,N/m\)  
+- **Potentiel de la pince :** harmonique  
+\[
+U_\text{trap}(x) = 0.5 \cdot \kappa \cdot (x-x_0)^2
+\]  
+- **Interaction paire :** Lennard-Jones  
+\[
+U_\text{pair}(r) = 4 \epsilon \left[ \left( \frac{\sigma}{r} \right)^{12} - \left( \frac{\sigma}{r} \right)^6 \right]
+\]  
+avec \(\sigma = 2\,\mu m\) et \(\epsilon = 6 k_B T\).
+## Étapes du code
+
+1. **Simulation Langevin 1D**  
+   - Sans interaction LJ → `rho0`  
+   - Avec interaction LJ → `rhoU`  
+
+2. **Histogrammes et densités**  
+   - Calcul des histogrammes des distances et conversion en densité normalisée  
+   - Lissage optionnel pour réduire le bruit statistique  
+
+3. **Sélection du domaine fiable**  
+   - Élimination des bins avec trop peu de counts ou densité trop faible  
+   - Conservation de la plus grande tranche continue pour éviter les erreurs `ln(0)`  
+
+4. **Reconstruction du potentiel**  
+\[
+U_\text{pair}(r) = - k_B T \ln \frac{\rho_U(r)}{\rho_0(r)}
+\]  
+   - Recalage pour que le potentiel reconstruit coïncide presque parfaitement avec le potentiel théorique  
+
+5. **Visualisation**  
+   - Histogrammes des densités pour chaque \(r_0\) avec zone fiable mise en jaune  
+   - Potentiel reconstruit vs potentiel théorique LJ pour chaque \(r_0\)  
+   - Comparaison globale pour toutes les distances \(r_0\)
+
+---
+
+## Fichiers générés
+
+- Dossier `figures/` : contient toutes les figures et fichiers CSV  
+
+### Figures individuelles
+
+- `histograms_r0_X.png` : histogrammes pour chaque \(r_0\)  
+- `Upair_vs_LJ_r0_X.png` : comparaison potentiel reconstruit vs LJ pour chaque \(r_0\)
+
+### Figure globale
+
+- `Upair_vs_LJ_all_r0.png` : comparaison de tous les \(r_0\) ensemble  
+
+### CSV (optionnel pour analyse)  
+
+- `rvals`, `rho0`, `rhoU`, `counts0`, `countsU` pour chaque \(r_0\) 
+## Exemple de figures
+
+### Histogrammes des densités
+
+![Histogrammes r_0](figures/histograms_r0_0.png)
+
+### Potentiel reconstruit vs Lennard-Jones
+
+![Potentiel r_0](figures/Upair_vs_LJ_r0_0.png)
+
+### Comparaison globale
+
+![Potentiels globaux](figures/Upair_vs_LJ_all_r0.png)
+
+## Instructions pour exécuter le code
+
+1. Installer les dépendances :  
+```bash
+pip install numpy matplotlib
